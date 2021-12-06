@@ -1,0 +1,4 @@
+#! /usr/bin/sh
+
+killall _sabar
+~/scripts/_sabar | lemonbar -f "mononoki Nerd Font Mono:bold:size=14" -F "#ebdbb2" -u 4 -U"#8ec07c" -B "#000000"
