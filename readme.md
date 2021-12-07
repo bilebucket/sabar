@@ -20,6 +20,4 @@ sabar is a simple system status script intended to be piped to lemonbar
 + Actual Makefile with install and uninstall steps
 + Allow (bspwm) colors be passed as arguments (or add a support for a
   configuration file)
-+ Fix error handling by logging at site instead of calling `check` (check
-  loses line context)
 + Remove psmisc dependency, write PID to a file and use kill instead

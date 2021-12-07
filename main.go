@@ -23,12 +23,6 @@ const (
 	updateInterval time.Duration = time.Second * 3
 )
 
-func check(err error) {
-	if err != nil {
-		log.Printf("%v", err)
-	}
-}
-
 func initializeLogging() (*os.File, error) {
 	fp, err := os.OpenFile("/tmp/sabar.log", os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -86,7 +80,9 @@ func (b bar) render() string {
 
 func memUsage() string {
 	memInfo, err := mem.VirtualMemory()
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 	usage := memInfo.UsedPercent
 
 	return fmt.Sprintf("R %v %.1f%%", sparkline(int(usage), 100), usage)
@@ -94,7 +90,9 @@ func memUsage() string {
 
 func cpuUsage() string {
 	percentages, err := cpu.Percent(0, false)
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 	usage := percentages[0]
 
 	return fmt.Sprintf("C %v %.1f%%", sparkline(int(usage), 100), usage)
@@ -104,7 +102,9 @@ var oldLoad float64 = 0.0
 
 func loadAvg() string {
 	loadStat, err := load.Avg()
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 
 	var direction rune = '免'
 	var l float64 = loadStat.Load1
@@ -126,7 +126,9 @@ func temperatures() string {
 	// is switched off (some wireless lan chips for example).
 	// We don't care about those warnings...
 	if _, ok := err.(*host.Warnings); !ok {
-		check(err)
+		if err != nil {
+			log.Printf("%v", err)
+		}
 	}
 	var highest float64 = 0.0
 	for _, t := range temperatures {
@@ -139,7 +141,9 @@ func temperatures() string {
 
 func diskUsage() string {
 	usage, err := disk.Usage("/")
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 	return fmt.Sprintf("[/ %0.1f%%]", usage.UsedPercent)
 }
 
@@ -150,7 +154,9 @@ func battery() string {
 	cmd.Stdout = &out
 
 	err := cmd.Run()
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 
 	output := strings.Split(out.String(), ",")[1]
 	output = strings.Trim(output, " ")
@@ -158,7 +164,9 @@ func battery() string {
 	output = strings.Replace(output, "\n", "", -1)
 
 	batteryPercentage, err := strconv.Atoi(output)
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 
 	return fmt.Sprintf("%s %d%%", sparkline(batteryPercentage, 100), batteryPercentage)
 }
@@ -170,7 +178,9 @@ func ssid() string {
 	cmd.Stdout = &out
 
 	err := cmd.Run()
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 
 	ssid := strings.Trim(out.String(), "\n")
 
@@ -187,10 +197,14 @@ func bspwm(c chan string) {
 
 	cmd := exec.Command("bspc", "subscribe", "report")
 	stdout, err := cmd.StdoutPipe()
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 	scanner := bufio.NewScanner(stdout)
 	err = cmd.Start()
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 
 	for scanner.Scan() {
 		output := strings.Split(scanner.Text(), ":")
@@ -228,7 +242,10 @@ func mocp() string {
 	cmd.Stdout = &out
 
 	err := cmd.Run()
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+		return ""
+	}
 
 	output := strings.Split(out.String(), "\n")
 
@@ -247,7 +264,9 @@ func mocp() string {
 		}
 		if strings.Contains(l, "State: ") {
 			mocpState := strings.Split(l, ": ")[1]
-			if mocpState == "PLAY" {
+			if mocpState == "STOP" {
+				return ""
+			} else if mocpState == "PLAY" {
 				state = ""
 			} else if mocpState == "PAUSE" {
 				state = ""
@@ -257,11 +276,15 @@ func mocp() string {
 		}
 		if strings.Contains(l, "CurrentSec: ") {
 			currentSec, err = strconv.Atoi(strings.Split(l, ": ")[1])
-			check(err)
+			if err != nil {
+				log.Printf("%v", err)
+			}
 		}
 		if strings.Contains(l, "TotalSec: ") {
 			totalSec, err = strconv.Atoi(strings.Split(l, ": ")[1])
-			check(err)
+			if err != nil {
+				log.Printf("%v", err)
+			}
 		}
 	}
 
@@ -282,7 +305,9 @@ func spacer() string {
 
 func main() {
 	logFile, err := initializeLogging()
-	check(err)
+	if err != nil {
+		log.Printf("%v", err)
+	}
 	defer logFile.Close()
 
 	var b bar = bar{
