@@ -5,13 +5,14 @@ sabar is a simple system status script intended to be piped to lemonbar
 ![screenshot](scrot.png)
 
 ### host dependencies:
-+ acpi		(acpi)			battery information
-+ bspc		(bspwm)			bspwm desktop states
-+ iwgetid		(wireless_tools)	currently connected ssid
++ acpi		        (acpi)			battery information
++ a patched font        (nerd-fonts-ttf)        for icons
++ bspc		        (bspwm)			bspwm desktop states
++ iwgetid		(wireless_tools)        currently connected ssid
 + killall		(psmisc)		for killing a existing instance
-+ lemonbar	(lemonbar-xft)		for actually displaying something on screen
-+ mocp		(moc)			currently playing music status
-+ a patched font  (nerd-fonts-ttf)        for icons
++ lemonbar	        (lemonbar-xft)	        for actually displaying something on screen
++ mocp		        (moc)			currently playing music status
++ xdo                   (xdo)                   for fixing lemonbar appearing on top of fullscreen windows
 
 ### go dependencies:
 + gopsutil

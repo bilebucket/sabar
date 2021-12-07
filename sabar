@@ -1,4 +1,17 @@
 #! /usr/bin/sh
 
+PANEL_NAME="sabar_panel"
+
 killall _sabar
-~/scripts/_sabar | lemonbar -f "mononoki Nerd Font Mono:bold:size=14" -F "#ebdbb2" -u 4 -U"#8ec07c" -B "#000000"
+~/scripts/_sabar | lemonbar -n "$PANEL_NAME" -f "mononoki Nerd Font Mono:bold:size=14" -F "#ebdbb2" -u 4 -U"#8ec07c" -B "#000000" &
+
+# Fix lemonbar appearing on top of fullscreen windows.
+# First, acquire lemonbar's window id
+until WID=$(xdo id -a "$PANEL_NAME")
+do
+  sleep 0.1
+done
+# Second, acquire bspwm's root window id
+REF=$(xdo id -n root | sort | head -n 1)
+# Third, place lemonbar below the root window
+xdo below -t "$REF" "$WID"
